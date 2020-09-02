@@ -630,7 +630,12 @@ def re_sender(node, duration, n, bitrate, attrs, ll, lfa, lf, path):
     'path', 
     type=click.Path(exists=True)
 )
-def re_receiver(port, duration, n, bitrate, attrs, ll, lfa, lf, path):
+@click.option(
+    '--verbose/--no-verbose',
+    default=False,
+    help='Activate DEBUG level of script logs'
+)
+def re_receiver(port, duration, n, bitrate, attrs, ll, lfa, lf, path, verbose):
     # receiver, listener
     # ../srt/srt-ethouris/_build/srt-test-live srt://:4200?groupconnect=true file://con
     # TODO: groupconnect=true changed to groupconnect=1, test this additionally once
@@ -651,6 +656,10 @@ def re_receiver(port, duration, n, bitrate, attrs, ll, lfa, lf, path):
         if lfa:
             args += ['-lfa']
             args += lfa
+
+    if verbose:
+        args += ['-v']
+
     interval = calculate_interval(bitrate)
     if n is None:
         n = int(duration // interval) + 1
