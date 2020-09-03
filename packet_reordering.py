@@ -631,9 +631,10 @@ def re_sender(node, duration, n, bitrate, attrs, ll, lfa, lf, path):
     type=click.Path(exists=True)
 )
 @click.option(
-    '--verbose/--no-verbose',
-    default=False,
-    help='Activate DEBUG level of script logs'
+    '--verbose',
+	type=click.Path(exists=False),
+    default='',
+    help='Activate VERBOSE log'
 )
 def re_receiver(port, duration, n, bitrate, attrs, ll, lfa, lf, path, verbose):
     # receiver, listener
@@ -657,8 +658,9 @@ def re_receiver(port, duration, n, bitrate, attrs, ll, lfa, lf, path, verbose):
             args += ['-lfa']
             args += lfa
 
-    if verbose:
+    if verbose != '':
         args += ['-v']
+        args += [f'./{verbose}']
 
     interval = calculate_interval(bitrate)
     if n is None:
