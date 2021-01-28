@@ -625,11 +625,22 @@ def re_sender(node, duration, n, bitrate, attrs, ll, lfa, lf, path):
     type=click.Path(),
     help='File to send logs to'
 )
+@click.option(
+    '--output', 
+    type=click.Path(exists=False),
+    help='File to send output to'
+)
 @click.argument(
     'path', 
     type=click.Path(exists=True)
 )
-def re_receiver(port, duration, n, bitrate, attrs, ll, lfa, lf, path):
+@click.option(
+    '--verbose',
+    type=click.Path(exists=False),
+    default='',
+    help='Activate VERBOSE log'
+)
+def re_receiver(port, duration, n, bitrate, attrs, ll, lfa, lf, output, path, verbose):
     # receiver, listener
     # ../srt/srt-ethouris/_build/srt-test-live srt://:4200?groupconnect=true file://con
     # TODO: groupconnect=true changed to groupconnect=1, test this additionally once
@@ -637,10 +648,15 @@ def re_receiver(port, duration, n, bitrate, attrs, ll, lfa, lf, path):
     srt_str = f'srt://:{port}'
     if attrs:
         srt_str += f'?{attrs}'
+    if output == None:
+        output_path = 'file://con'
+    else:
+        output_path = output
+
     args = [
         f'{path}',
         srt_str,
-        'file://con',
+        output_path,
     ]
     if lf:
         args += [
@@ -650,6 +666,11 @@ def re_receiver(port, duration, n, bitrate, attrs, ll, lfa, lf, path):
         if lfa:
             args += ['-lfa']
             args += lfa
+
+    if verbose != '':
+        args += ['-v']
+        args += [f'./{verbose}']
+
     interval = calculate_interval(bitrate)
     if n is None:
         n = int(duration // interval) + 1
